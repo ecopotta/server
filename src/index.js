@@ -760,6 +760,23 @@ app.put("/update-settings", async(req,res)=> {
   }
 })
 
+cron.schedule("* * * * *", async () => {
+  const client = await clientDatabase.connect();
+  const argentinaTime = dayjs().tz('America/Argentina/Buenos_Aires').format("YYYY-MM-DD");
+  const query = "UPDATE promotions SET enabled = false WHERE end_date = $1"
+  try {
+    const response = await client.query(query, [argentinaTime]);
+    if (response.rowCount > 0) {
+      console.log("Promociones actualizadas correctamente");
+    }else{
+      console.log("No se encontraron promociones");
+    }
+
+  } catch (error) {
+    console.log(error)
+
+  }
+})
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
