@@ -188,15 +188,13 @@ const uploadToCloudinary = async (file) => {
     const query3 = "SELECT * FROM product_images"
     const query4 = "SELECT * FROM promotions"
     const query5 = "SELECT * FROM banners"
-    const query6 = "SELECT * FROM ajustes"
     try {
-      const [products, categories, imageUrls, promotions, banners, ajustes] = await Promise.all([
+      const [products, categories, imageUrls, promotions, banners] = await Promise.all([
         client.query(query1),
         client.query(query2),
         client.query(query3),
         client.query(query4),
         client.query(query5),
-        client.query(query6),
       ]);
       
       return res.status(200).json({ 
@@ -205,7 +203,6 @@ const uploadToCloudinary = async (file) => {
         imageUrls: imageUrls.rows,
         promotions: promotions.rows,
         banners: banners.rows,
-        ajustes: ajustes.rows
       });
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -738,17 +735,18 @@ app.delete("/delete-banner/:bannerId", async(req,res)=> {
   
 app.put("/update-settings", async(req,res)=> {
   const client = await clientDatabase.connect();
-  const settings = req.body
-  console.log(settings)
+  const {state} = req.query;
   
   const query = "UPDATE ajustes SET settings = $1 WHERE id = 2"
 
   try {
-    if (!settings) {
+    if (!state ) {
       return res.status(400).json({ message: "Faltan datos obligatorios" });
     }
-
-    const response = await client.query(query, [settings]);
+    const dataToSend = {
+      "page_enabled": Boolean(state)
+    }
+    const response = await client.query(query, [JSON.stringify(dataToSend)]);
     if (response.rowCount > 0) {
       return res.status(200).json({message: "Ajustes actualizados correctamente"});
     }
