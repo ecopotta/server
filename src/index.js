@@ -758,7 +758,7 @@ app.put("/update-settings", async(req,res)=> {
   }
 })
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("30 * * * *", async () => {
   const client = await clientDatabase.connect();
   const argentinaTime = dayjs().tz('America/Argentina/Buenos_Aires').format("YYYY-MM-DD");
   const query = "UPDATE promotions SET enabled = false WHERE end_date = $1"
